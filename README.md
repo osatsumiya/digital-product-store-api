@@ -1,15 +1,38 @@
 # Digital Product Store API
 
-Digital Product Store API is a backend project for managing digital products such as ebooks, courses, and software licenses.
+Backend REST API for managing digital products such as ebooks, online courses, and software licenses.
 
-## Planned Features
+## Features
 - Product management
-- Category management
 - Customer management
 - Order management
+- License management
+- PostgreSQL integration
+- GORM migrations
 
 ## Tech Stack
 - Go
 - Gin
-- GORM
 - PostgreSQL
+- GORM
+
+## Endpoints
+
+### Products
+- GET /products
+- GET /products/:id
+- POST /products
+- PUT /products/:id
+- DELETE /products/:id
+
+### Customers
+- GET /customers
+- POST /customers
+
+### Orders
+- GET /orders
+- POST /orders
+
+### Licenses
+- GET /licenses
+- POST /licenses

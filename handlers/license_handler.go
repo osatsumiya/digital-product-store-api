@@ -11,7 +11,7 @@ import (
 
 func GetLicenses(c *gin.Context) {
 	var licenses []models.License
-	database.DB.Find(&licenses)
+	database.DB.Preload("Product").Preload("Customer").Find(&licenses)
 	c.JSON(http.StatusOK, licenses)
 }
 

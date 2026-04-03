@@ -6,4 +6,7 @@ type License struct {
 	CustomerID uint   `json:"customer_id"`
 	LicenseKey string `json:"license_key"`
 	IsActive   bool   `json:"is_active"`
+
+	Product  Product  `gorm:"foreignKey:ProductID" json:"product"`
+	Customer Customer `gorm:"foreignKey:CustomerID" json:"customer"`
 }
