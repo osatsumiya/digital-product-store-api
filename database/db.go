@@ -28,5 +28,7 @@ func Connect() {
 		&models.Customer{},
 		&models.Order{},
 		&models.License{},
+		&models.User{},
+		&models.FavoriteProduct{},
 	)
 }
