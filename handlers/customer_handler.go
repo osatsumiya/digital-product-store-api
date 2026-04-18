@@ -32,6 +32,16 @@ func CreateCustomer(c *gin.Context) {
 		return
 	}
 
-	database.DB.Create(&customer)
+	var existingCustomer models.Customer
+	if err := database.DB.Where("email = ?", customer.Email).First(&existingCustomer).Error; err == nil {
+		c.JSON(http.StatusOK, existingCustomer)
+		return
+	}
+
+	if err := database.DB.Create(&customer).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create customer"})
+		return
+	}
+
 	c.JSON(http.StatusCreated, customer)
 }

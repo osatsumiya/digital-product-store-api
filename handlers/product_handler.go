@@ -86,11 +86,13 @@ func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 
 	var product models.Product
+
 	if err := database.DB.First(&product, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
 		return
 	}
 
 	database.DB.Delete(&product)
-	c.JSON(http.StatusOK, gin.H{"message": "product deleted successfully"})
+
+	c.JSON(http.StatusOK, gin.H{"message": "product deleted"})
 }
