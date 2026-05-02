@@ -3,20 +3,27 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 )
 
+func getRecommendationURL() string {
+	url := os.Getenv("RECOMMENDATION_SERVICE_URL")
+	if url == "" {
+		return "http://localhost:8083"
+	}
+	return url
+}
+
 func GetProductRecommendations(c *gin.Context) {
 	productId := c.Param("id")
 
-	// 🔹 ЛОГ (из лекции)
 	log.Println("Calling recommendation-service for product:", productId)
 
 	client := resty.New()
 
-	// 🔹 Resty middleware (hooks)
 	client.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
 		log.Println("[Resty] Request:", r.Method, r.URL)
 		return nil
@@ -27,9 +34,11 @@ func GetProductRecommendations(c *gin.Context) {
 		return nil
 	})
 
+	url := getRecommendationURL() + "/recommendations/" + productId
+
 	resp, err := client.R().
 		SetHeader("Accept", "application/json").
-		Get("http://localhost:8083/recommendations/" + productId)
+		Get(url)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

@@ -1,0 +1,72 @@
+services:
+  db:
+    image: postgres:15
+    container_name: luzmuerta-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123123
+      POSTGRES_DB: digital_product_store
+    ports:
+      - "5432:5432"
+    volumes:
+      - luzmuerta_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d digital_product_store"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    image: migrate/migrate
+    container_name: luzmuerta-migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://postgres:123123@db:5432/digital_product_store?sslmode=disable",
+        "up"
+      ]
+
+  recommendation-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_DIR: ./recommendation-service
+    container_name: luzmuerta-recommendation-service
+    ports:
+      - "8083:8083"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_DIR: .
+    container_name: luzmuerta-backend
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      recommendation-service:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: 123123
+      DB_NAME: digital_product_store
+      DB_PORT: 5432
+      RECOMMENDATION_SERVICE_URL: http://recommendation-service:8083
+    ports:
+      - "8080:8080"
+      - "8082:8082"
+
+volumes:
+  luzmuerta_postgres_data:
